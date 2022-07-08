@@ -19,7 +19,7 @@ dataset2 = CustomDataSet('np_x_imp.npy','np_y_imp.npy','./data_IGL/')
 train_loader1 = DataLoader(dataset1, shuffle = True,batch_size = 1000)
 train_loader2 = DataLoader(dataset2, shuffle = True,batch_size = 100)
 
-epochs = 50
+epochs = 120
 all_dim = 24
 robot_dim = 9
 device = "cuda"

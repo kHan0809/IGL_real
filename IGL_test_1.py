@@ -106,14 +106,14 @@ if __name__ == "__main__":
     all_dim = 24 # 9 + 13 + 1
     robot_dim = 9
     igl = IGL_large(all_dim, robot_dim, 'cpu')
-    igl.load_state_dict(torch.load('./model_save/IGL_imp_real'))
+    igl.load_state_dict(torch.load('./model_save/IGL_imp'))
 
     state_dim = 32
     next_state_dim = 9
     action_dim = 7
 
     Inv = InvDyn_add(state_dim,next_state_dim, action_dim, 'cpu')
-    Inv.load_state_dict(torch.load('./model_save/InvDyn_4.pth'))
+    # Inv.load_state_dict(torch.load('./model_save/InvDyn_4.pth'))
 
     igl.eval()
     Inv.eval()
@@ -151,7 +151,7 @@ if __name__ == "__main__":
             elif action_rot[1]<-2.0:
                 action_rot[1] += np.pi * 2
 
-            action_rot *= 3
+            # action_rot *= 3
             # action_rot[1] = action_rot[1] * 2
             # action_rot[2] = action_rot[2] * 2
             if key =="a":
