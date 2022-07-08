@@ -242,7 +242,7 @@ def fix_traj(new_traj, traj1,traj2,coef):
 
 data_concat = []
 for pickle_data in os.listdir(os.getcwd()+'/data_IGL'):
-    if 'data_IGL_new_1' in pickle_data:
+    if 'data_IGL' in pickle_data and 'new' not in pickle_data:
         with open('./data_IGL/'+ pickle_data, 'rb') as f:
             data = pickle.load(f)
             data_concat.extend(data)

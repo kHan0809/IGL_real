@@ -1,0 +1,6 @@
+
+*.json
+*.pth
+*pickle
+
+__pycache__
