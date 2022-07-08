@@ -19,7 +19,7 @@ dataset2 = CustomDataSet('np_x_imp.npy','np_y_imp.npy','./data_IGL/')
 train_loader1 = DataLoader(dataset1, shuffle = True,batch_size = 1000)
 train_loader2 = DataLoader(dataset2, shuffle = True,batch_size = 100)
 
-epochs = 120
+epochs = 50
 all_dim = 24
 robot_dim = 9
 device = "cuda"
@@ -41,7 +41,7 @@ for i in range(epochs):
         loss_.backward()
         optimizer.step()
         temp_loss1 += loss_.item()
-    for j in range(3):
+    for j in range(2):
         for k, (state, label) in enumerate(train_loader2):
             optimizer.zero_grad()
             output = agent(state.type(torch.FloatTensor).to(device))
@@ -51,4 +51,4 @@ for i in range(epochs):
             temp_loss2 += loss_.item()
     print("========",i,"========")
     print(temp_loss1,temp_loss2)
-torch.save(agent.state_dict(), './model_save/IGL_stack_imp')
+torch.save(agent.state_dict(), './model_save/IGL_imp')

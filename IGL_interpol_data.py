@@ -242,7 +242,7 @@ def fix_traj(new_traj, traj1,traj2,coef):
 
 data_concat = []
 for pickle_data in os.listdir(os.getcwd()+'/data_IGL'):
-    if 'data_IGL' in pickle_data and 'new' not in pickle_data:
+    if 'new' in pickle_data:
         with open('./data_IGL/'+ pickle_data, 'rb') as f:
             data = pickle.load(f)
             data_concat.extend(data)
@@ -277,7 +277,7 @@ for i in range(len(data_concat)-1):
             All_traj.append(fixed_traj)
 
 print(len(All_traj))
-with open('./data_IGL/Inter_traj_midel_no_fix2.pickle', 'wb') as f:
+with open('./data_IGL/Inter_traj_middle.pickle', 'wb') as f:
     pickle.dump(All_traj, f, pickle.HIGHEST_PROTOCOL)
 
 #=========================그래프 그리는거야~~===================#

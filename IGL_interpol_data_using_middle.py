@@ -242,7 +242,7 @@ All_traj = []
 coefs = np.linspace(0,1,3,endpoint=True)
 print(len(data_concat))
 for i in range(len(data_concat)-1):
-    for j in range(i+len(data_concat)//2,len(data_concat)):
+    for j in range(i+len(data_concat)//2+len(data_concat)//3,len(data_concat)):
         choice=np.array([i,j])
 
         obs_robot1 = np.array(data_concat[choice[0]]['obs_robot'])
