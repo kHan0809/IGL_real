@@ -231,7 +231,7 @@ def fix_traj(new_traj, traj1,traj2,coef):
 data_concat = []
 for pickle_data in os.listdir(os.getcwd()+'/data_IGL'):
     # if 'IGL' in pickle_data:
-    if 'Inter_traj_midel_no_fix2' in pickle_data:
+    if 'Inter_traj_middle' in pickle_data:
         with open('./data_IGL/'+ pickle_data, 'rb') as f:
             data = pickle.load(f)
             data_concat.extend(data)
@@ -242,7 +242,7 @@ All_traj = []
 coefs = np.linspace(0,1,3,endpoint=True)
 print(len(data_concat))
 for i in range(len(data_concat)-1):
-    for j in range(i+len(data_concat)//2+len(data_concat)//3 ,len(data_concat)):
+    for j in range(i+len(data_concat)//2,len(data_concat)):
         choice=np.array([i,j])
 
         obs_robot1 = np.array(data_concat[choice[0]]['obs_robot'])
@@ -264,7 +264,7 @@ for i in range(len(data_concat)-1):
             All_traj.append(fixed_traj)
 
 print(len(All_traj))
-with open('./data_IGL/Inter_traj_using_mid_no_fix2_long.pickle', 'wb') as f:
+with open('./data_IGL/Inter_traj_using_middle.pickle', 'wb') as f:
     pickle.dump(All_traj, f, pickle.HIGHEST_PROTOCOL)
 #=========================그래프 그리는거야~~===================#
 # import matplotlib.pyplot as plt
