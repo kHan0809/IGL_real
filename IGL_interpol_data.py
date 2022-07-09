@@ -11,7 +11,7 @@ def sub_goal_separator(sub_goal):
         if sub_goal[idx] != sub_goal[idx+1]:
             count += 1
             idx_list.append(idx)
-            if count == 2:
+            if count == 3:
                 break
         else:
             pass
@@ -242,7 +242,7 @@ def fix_traj(new_traj, traj1,traj2,coef):
 
 data_concat = []
 for pickle_data in os.listdir(os.getcwd()+'/data_IGL'):
-    if 'data_IGL' in pickle_data and 'new' not in pickle_data:
+    if 'sg' in pickle_data and 'new' not in pickle_data:
         with open('./data_IGL/'+ pickle_data, 'rb') as f:
             data = pickle.load(f)
             data_concat.extend(data)
@@ -277,7 +277,7 @@ for i in range(len(data_concat)-1):
             All_traj.append(fixed_traj)
 
 print(len(All_traj))
-with open('./data_IGL/Inter_traj_midel_no_fix2.pickle', 'wb') as f:
+with open('./data_IGL/Inter_sg_traj.pickle', 'wb') as f:
     pickle.dump(All_traj, f, pickle.HIGHEST_PROTOCOL)
 
 #=========================그래프 그리는거야~~===================#
