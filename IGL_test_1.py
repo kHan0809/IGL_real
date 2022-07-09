@@ -136,30 +136,34 @@ if __name__ == "__main__":
             curr_euler = curr_r.as_euler('zyz',degrees=False)
             action_rot  = next_euler-curr_euler
             action_grip = np.array([next[-1]  - obs_robot_pos[-1]])
+            print("======================")
             if action_rot[0]>2.0:
-                print(action_rot[0])
-                action_rot[0] -=np.pi*2
+                print("x",action_rot[0])
+                action_rot[0] -=(np.pi*2)
+                print("x_after",action_rot[0])
             elif action_rot[0]<-2.0:
-                print(action_rot[0])
-                action_rot[0] += np.pi * 2
+                print("x",action_rot[0])
+                action_rot[0] += (np.pi * 2)
+                print("x_after", action_rot[0])
 
             if action_rot[1]>2.0:
-                print(action_rot[1])
+                print("y",action_rot[1])
                 action_rot[1] -=np.pi*2
             elif action_rot[1]<-2.0:
-                print(action_rot[1])
+                print("y",action_rot[1])
                 action_rot[1] += np.pi * 2
 
             if action_rot[2]>2.0:
-                print(action_rot[2])
+                print("z",action_rot[2])
                 action_rot[2] -=np.pi*2
             elif action_rot[2]<-2.0:
-                print(action_rot[2])
+                print("z",action_rot[2])
                 action_rot[2] += np.pi * 2
 
             # action_rot *= 1
             # action_rot[1] = action_rot[1] * 2
-            action_rot[2] = action_rot[2] * 10
+            # action_rot[2] = action_rot[2] * 10
+
             if key =="a":
                 action_pos =np.array([0,-1,0])
             if key =="d":
@@ -207,7 +211,7 @@ if __name__ == "__main__":
             one_state = np.concatenate((obs_robot_pos, obs_obj))
             current_subgoal = np.array([get_current_stage(one_state)])
             current_subgoal = np.array([0])
-            print(current_subgoal)
+            # print(current_subgoal)
             # if i == 50:
             #     raise
             # key = input()
