@@ -128,7 +128,7 @@ if __name__ == "__main__":
             next_=igl(torch.FloatTensor(one_state).unsqueeze(0))
             # action=Inv.forward(torch.FloatTensor(obs_robot).unsqueeze(0),next_)
             next = next_.squeeze(0).detach().numpy()
-            action_pos = np.array([(next[0]-obs_robot_pos[0])*10,(next[1]-obs_robot_pos[1])*10,(next[2]-obs_robot_pos[2])*10])
+            action_pos = np.array([(next[0]-obs_robot_pos[0])*30,(next[1]-obs_robot_pos[1])*30,(next[2]-obs_robot_pos[2])*30])
 
             next_r = R.from_quat(next[3:7])
             curr_r = R.from_quat(obs_robot_pos[3:7])
@@ -146,14 +146,14 @@ if __name__ == "__main__":
             elif action_rot[1]<-2.0:
                 action_rot[1] += np.pi * 2
 
-            if action_rot[1]>2.0:
-                action_rot[1] -=np.pi*2
-            elif action_rot[1]<-2.0:
-                action_rot[1] += np.pi * 2
+            if action_rot[2]>2.0:
+                action_rot[2] -=np.pi*2
+            elif action_rot[2]<-2.0:
+                action_rot[2] += np.pi * 2
 
             # action_rot *= 3
-            # action_rot[1] = action_rot[1] * 2
-            # action_rot[2] = action_rot[2] * 2
+            action_rot[1] = action_rot[1]
+            action_rot[2] = action_rot[2]*5
             if key =="a":
                 action_pos =np.array([0,-1,0])
             if key =="d":
@@ -163,6 +163,7 @@ if __name__ == "__main__":
             if key =="s":
                 action_pos =np.array([1,0,0])
 
+            # action_rot *= 2
             action = np.concatenate((action_pos,action_rot,action_grip))
 
             # if i>2:

@@ -189,9 +189,11 @@ def collect_human_trajectory(env, device, arm, env_configuration):
 def get_current_stage(one_state):
     flag = 0
 
-    if sum((one_state[:3] - one_state[9:12]) ** 2) < 0.01 and abs(one_state[7]<0.025):
+    if (one_state[0] - one_state[9]) < 0.015 and (one_state[1] - one_state[10]) < 0.015 and (one_state[2] - one_state[11]) < 0.015:
         flag += 1
-    if sum((one_state[:3] - one_state[9:12]) ** 2) < 0.01 and abs(one_state[7]<0.025) and abs(one_state[11] - one_state[-5])>0.045:
+    if (one_state[0] - one_state[9]) < 0.015 and (one_state[1] - one_state[10]) < 0.015 and (one_state[2] - one_state[11]) < 0.015 and abs(one_state[7]<0.025):
+        flag += 1
+    if (one_state[0] - one_state[9]) < 0.015 and (one_state[1] - one_state[10]) < 0.015 and (one_state[2] - one_state[11]) < 0.015 and abs(one_state[11] - one_state[-5])>0.045:
         flag += 1
     return flag
 
@@ -366,6 +368,6 @@ if __name__ == "__main__":
         epi=collect_human_trajectory(env, device, args.arm, args.config)
         total_epi.append(epi)
 
-        with open('data_IGL_new_1.pickle', 'wb') as f:
+        with open('data_IGL_sg_1.pickle', 'wb') as f:
             pickle.dump(total_epi, f, pickle.HIGHEST_PROTOCOL)
         # gather_demonstrations_as_hdf5(tmp_directory, new_dir, env_info)

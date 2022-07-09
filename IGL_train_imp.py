@@ -13,13 +13,13 @@ class CustomDataSet(Dataset):
         return len(self.x)
     def __getitem__(self,idx):
         return self.x[idx], self.y[idx]
-dataset1 = CustomDataSet('np_x_no_imp.npy','np_y_no_imp.npy','./data_IGL/')
-dataset2 = CustomDataSet('np_x_imp.npy','np_y_imp.npy','./data_IGL/')
+dataset1 = CustomDataSet('np_x_sg_no_imp.npy','np_y_sg_no_imp.npy','./data_IGL/')
+dataset2 = CustomDataSet('np_x_sg_imp.npy','np_y_sg_imp.npy','./data_IGL/')
 
 train_loader1 = DataLoader(dataset1, shuffle = True,batch_size = 1000)
 train_loader2 = DataLoader(dataset2, shuffle = True,batch_size = 100)
 
-epochs = 120
+epochs = 60
 all_dim = 24
 robot_dim = 9
 device = "cuda"
@@ -51,4 +51,4 @@ for i in range(epochs):
             temp_loss2 += loss_.item()
     print("========",i,"========")
     print(temp_loss1,temp_loss2)
-torch.save(agent.state_dict(), './model_save/IGL_imp')
+torch.save(agent.state_dict(), './model_save/IGL_sg_imp')
