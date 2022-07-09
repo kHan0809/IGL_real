@@ -2,5 +2,5 @@
 *.json
 *.pth
 *pickle
-
+*.npy
 __pycache__

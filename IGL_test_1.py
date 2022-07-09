@@ -106,14 +106,14 @@ if __name__ == "__main__":
     all_dim = 24 # 9 + 13 + 1
     robot_dim = 9
     igl = IGL_large(all_dim, robot_dim, 'cpu')
-    igl.load_state_dict(torch.load('./model_save/IGL_imp_real'))
+    igl.load_state_dict(torch.load('./model_save/IGL_imp2'))
 
     state_dim = 32
     next_state_dim = 9
     action_dim = 7
 
     Inv = InvDyn_add(state_dim,next_state_dim, action_dim, 'cpu')
-    Inv.load_state_dict(torch.load('./model_save/InvDyn_4.pth'))
+    # Inv.load_state_dict(torch.load('./model_save/InvDyn_4.pth'))
 
     igl.eval()
     Inv.eval()
@@ -128,7 +128,7 @@ if __name__ == "__main__":
             next_=igl(torch.FloatTensor(one_state).unsqueeze(0))
             # action=Inv.forward(torch.FloatTensor(obs_robot).unsqueeze(0),next_)
             next = next_.squeeze(0).detach().numpy()
-            action_pos = np.array([(next[0]-obs_robot_pos[0])*10,(next[1]-obs_robot_pos[1])*10,(next[2]-obs_robot_pos[2])*10])
+            action_pos = np.array([(next[0]-obs_robot_pos[0]),(next[1]-obs_robot_pos[1]),(next[2]-obs_robot_pos[2])])*20
 
             next_r = R.from_quat(next[3:7])
             curr_r = R.from_quat(obs_robot_pos[3:7])
@@ -137,23 +137,29 @@ if __name__ == "__main__":
             action_rot  = next_euler-curr_euler
             action_grip = np.array([next[-1]  - obs_robot_pos[-1]])
             if action_rot[0]>2.0:
+                print(action_rot[0])
                 action_rot[0] -=np.pi*2
             elif action_rot[0]<-2.0:
+                print(action_rot[0])
                 action_rot[0] += np.pi * 2
 
             if action_rot[1]>2.0:
+                print(action_rot[1])
                 action_rot[1] -=np.pi*2
             elif action_rot[1]<-2.0:
+                print(action_rot[1])
                 action_rot[1] += np.pi * 2
 
-            if action_rot[1]>2.0:
-                action_rot[1] -=np.pi*2
-            elif action_rot[1]<-2.0:
-                action_rot[1] += np.pi * 2
+            if action_rot[2]>2.0:
+                print(action_rot[2])
+                action_rot[2] -=np.pi*2
+            elif action_rot[2]<-2.0:
+                print(action_rot[2])
+                action_rot[2] += np.pi * 2
 
-            action_rot *= 3
+            # action_rot *= 1
             # action_rot[1] = action_rot[1] * 2
-            # action_rot[2] = action_rot[2] * 2
+            action_rot[2] = action_rot[2] * 10
             if key =="a":
                 action_pos =np.array([0,-1,0])
             if key =="d":
@@ -164,6 +170,7 @@ if __name__ == "__main__":
                 action_pos =np.array([1,0,0])
 
             action = np.concatenate((action_pos,action_rot,action_grip))
+
 
             # if i>2:
             #     if (sum(abnormal)/len(abnormal))<0.004:
@@ -180,12 +187,12 @@ if __name__ == "__main__":
 
             obs, reward, done, _ = env.step(action)
             # obs, reward, done, _ = env.step(action.squeeze(0).detach().numpy())
-            print("===============")
+            # print("===============")
             # print(action.detach().numpy())
-            print(action)
+            # print(action)
             # print(obs_robot_pos)
             # print(next_.squeeze(0).detach().numpy())
-            print((next_.squeeze(0).detach().numpy()-obs_robot_pos))
+            # print((next_.squeeze(0).detach().numpy()-obs_robot_pos))
             # key = input()
 
 
