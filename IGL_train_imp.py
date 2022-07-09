@@ -16,39 +16,48 @@ class CustomDataSet(Dataset):
 dataset1 = CustomDataSet('np_x_sg_no_imp.npy','np_y_sg_no_imp.npy','./data_IGL/')
 dataset2 = CustomDataSet('np_x_sg_imp.npy','np_y_sg_imp.npy','./data_IGL/')
 
-train_loader1 = DataLoader(dataset1, shuffle = True,batch_size = 1000)
-train_loader2 = DataLoader(dataset2, shuffle = True,batch_size = 100)
+grid_lr    = [0.0001, 0.00005, 0.00001]
+grid_wd    = [1e-4,1e-5,1e-6]
+grid_batch = [200,100,50]
 
-epochs = 60
-all_dim = 24
-robot_dim = 9
-device = "cuda"
-agent=IGL_large(all_dim,robot_dim,device)
-agent.to(device)
-print(agent)
-# optimizer = torch.optim.Adam(agent.parameters(), lr=0.0001,weight_decay=1e-5)
-optimizer = torch.optim.Adam(agent.parameters(), lr=0.0001,weight_decay=1e-5)
+for j,batch in enumerate(grid_batch):
+    train_loader1 = DataLoader(dataset1, shuffle = True,batch_size = 1000)
+    train_loader2 = DataLoader(dataset2, shuffle = True,batch_size = batch)
 
-agent.train()
-loss = nn.MSELoss()
-for i in range(epochs):
-    temp_loss1 = 0
-    temp_loss2 = 0
-    for k,(state,label) in enumerate(train_loader1):
-        optimizer.zero_grad()
-        output=agent(state.type(torch.FloatTensor).to(device))
-        loss_ = loss(label.type(torch.FloatTensor).to(device),output)
-        loss_.backward()
-        optimizer.step()
-        temp_loss1 += loss_.item()
-    for j in range(2):
-        for k, (state, label) in enumerate(train_loader2):
-            optimizer.zero_grad()
-            output = agent(state.type(torch.FloatTensor).to(device))
-            loss_ = loss(label.type(torch.FloatTensor).to(device), output)
-            loss_.backward()
-            optimizer.step()
-            temp_loss2 += loss_.item()
-    print("========",i,"========")
-    print(temp_loss1,temp_loss2)
-torch.save(agent.state_dict(), './model_save/IGL_sg_imp')
+    epochs = 200
+    all_dim = 24
+    robot_dim = 9
+    device = "cuda"
+    agent=IGL_large(all_dim,robot_dim,device)
+    agent.to(device)
+    # print(agent)
+    # optimizer = torch.optim.Adam(agent.parameters(), lr=0.0001,weight_decay=1e-5)
+    for k,lr in enumerate(grid_lr):
+        for q, wd in enumerate(grid_wd):
+            optimizer = torch.optim.Adam(agent.parameters(), lr=lr,weight_decay=wd)
+            scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=50, eta_min=0)
+
+            agent.train()
+            loss = nn.MSELoss()
+            for i in range(epochs):
+                temp_loss1 = 0
+                temp_loss2 = 0
+                for k,(state,label) in enumerate(train_loader1):
+                    optimizer.zero_grad()
+                    output=agent(state.type(torch.FloatTensor).to(device))
+                    loss_ = loss(label.type(torch.FloatTensor).to(device),output)
+                    loss_.backward()
+                    optimizer.step()
+                    temp_loss1 += loss_.item()
+                for j in range(2):
+                    for k, (state, label) in enumerate(train_loader2):
+                        optimizer.zero_grad()
+                        output = agent(state.type(torch.FloatTensor).to(device))
+                        loss_ = loss(label.type(torch.FloatTensor).to(device), output)
+                        loss_.backward()
+                        optimizer.step()
+                        temp_loss2 += loss_.item()
+                scheduler.step()
+                print("========",i,"========")
+                print(temp_loss1,temp_loss2)
+            torch.save(agent.state_dict(), './model_save/IGL_sg_imp'+str(j)+str(k)+str(q))
