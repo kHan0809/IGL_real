@@ -95,7 +95,6 @@ if __name__ == "__main__":
     obs_robot_pos = _flatten_obs(obs,obs_robot_pos_list)
 
     one_state = np.concatenate((obs_robot_pos, obs_obj))
-    temp_current_pos = _flatten_obs(obs,temp_list)
     # current_subgoal = np.array([get_current_stage(one_state)])
     current_subgoal = np.array([0])
 
@@ -124,13 +123,14 @@ if __name__ == "__main__":
     from scipy.spatial.transform import Rotation as R
     key = " "
     while True:
-        for i in range(500):
+        obs_robot_traj = []
+        obs_obj_traj   = []
+        next_traj      = []
+        for i in range(300):
             one_state = np.concatenate((one_state, current_subgoal))
             next_=igl(torch.FloatTensor(one_state).unsqueeze(0))
-            # action=Inv.forward(torch.FloatTensor(obs_robot).unsqueeze(0),next_)
             next = next_.squeeze(0).detach().numpy()
             action_pos = np.array([(next[0]-obs_robot_pos[0]),(next[1]-obs_robot_pos[1]),(next[2]-obs_robot_pos[2])])*10
-            # action_pos = (obs_obj[:3] - obs_robot_pos[:3])
 
             next_r = R.from_quat(next[3:7])
             curr_r = R.from_quat(obs_robot_pos[3:7])
@@ -153,67 +153,86 @@ if __name__ == "__main__":
                 action_rot[2] -=np.pi*2
             elif action_rot[2]<-2.0:
                 action_rot[2] += np.pi * 2
-            print("===============")
-            print(action_rot)
-
-            # # action_rot *= 3
-            # action_rot[1] = action_rot[1]
-            # action_rot[2] = action_rot[2]/2
-            if key =="a":
-                action_pos =np.array([0,-1,0])
-            if key =="d":
-                action_pos =np.array([0,1,0])
-            if key =="w":
-                action_pos =np.array([-1,0,0])
-            if key =="s":
-                action_pos =np.array([1,0,0])
-
-            # action_rot /= 20
-            # action_rot[0] = np.array([0])
-            # action_rot[1] = np.array([0])
+            action_rot *= 0
             action = np.concatenate((action_pos,action_rot,action_grip))
-
-            # if i>2:
-            #     if (sum(abnormal)/len(abnormal))<0.004:
-            #         print("abnormal detect")
-            #
-            #         for i in range(10):
-            #             if i < 7:
-            #                 action = torch.Tensor([0., 0., 3.75, 0., 0., 0., -1.0])
-            #             else:
-            #                 action = torch.Tensor([-3.75, 0., 0, 0., 0., 0., -1.0])
-            #             env.step(action.squeeze(0).detach().numpy())
-            #             env.render()
 
 
             obs, reward, done, _ = env.step(action)
-            # obs, reward, done, _ = env.step(action.squeeze(0).detach().numpy())
 
-            # print(action.detach().numpy())
-            print(action)
-            # print(obs_robot_pos)
-            # print(next_.squeeze(0).detach().numpy())
-            print((next_.squeeze(0).detach().numpy()-obs_robot_pos))
-            # key = input()
-
+            obs_robot_traj.append(obs_robot_pos.tolist())
+            obs_obj_traj.append(obs_obj.tolist())
+            next_traj.append(next.tolist())
 
             obs_robot = _flatten_obs(obs, obs_robot_list)
             obs_obj = _flatten_obs(obs, obs_obj_list)
 
             obs_robot_pos = _flatten_obs(obs, obs_robot_pos_list)
-            temp_next_pos = _flatten_obs(obs,temp_list)
-            abnormal.append(sum(abs(temp_current_pos-temp_next_pos)))
-            temp_current_pos = temp_next_pos
-            # print(abnormal)
             one_state = np.concatenate((obs_robot_pos, obs_obj))
             current_subgoal = np.array([get_current_stage(one_state)])
             current_subgoal = np.array([0])
-            print(current_subgoal)
-            # if i == 50:
-            #     raise
-            # key = input()
+
 
             env.render()
+        obs_robot_traj = np.array(obs_robot_traj)
+        obs_obj_traj   = np.array(obs_obj_traj)
+        next_traj      = np.array(next_traj)
+
+        import matplotlib.pyplot as plt
+        from scipy.spatial.transform import Rotation as R
+
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+        scale = 500
+        x, y, z = zip(*obs_robot_traj[:,:3])
+        ax.scatter(x, y, z, color='b', alpha=1.0)
+        r = R.from_quat(obs_robot_traj[:,3:7])
+        # ==z==
+        U, V, W = zip(*(r.as_matrix()[:, :, 2] / scale))
+        ax.quiver(x, y, z, U, V, W, color='b')
+        # ==y==
+        U, V, W = zip(*(r.as_matrix()[:, :, 1] / scale))
+        ax.quiver(x, y, z, U, V, W, color='g')
+        # ==x==
+        U, V, W = zip(*(r.as_matrix()[:, :, 0] / scale))
+        ax.quiver(x, y, z, U, V, W, color='r')
+
+        x, y, z = zip(*obs_obj_traj[:,:3])
+        ax.scatter(x, y, z, color='m', alpha=1.0)
+        r = R.from_quat(obs_obj_traj[:,3:7])
+        # ==z==
+        U, V, W = zip(*(r.as_matrix()[:, :, 2] / scale))
+        ax.quiver(x, y, z, U, V, W, color='b')
+        # ==y==
+        U, V, W = zip(*(r.as_matrix()[:, :, 1] / scale))
+        ax.quiver(x, y, z, U, V, W, color='g')
+        # ==x==
+        U, V, W = zip(*(r.as_matrix()[:, :, 0] / scale))
+        ax.quiver(x, y, z, U, V, W, color='r')
+
+        x, y, z = zip(*next_traj[:,:3])
+        ax.scatter(x, y, z, color='c', alpha=1.0)
+        r = R.from_quat(next_traj[:,3:7])
+        # ==z==
+        U, V, W = zip(*(r.as_matrix()[:, :, 2] / scale))
+        ax.quiver(x, y, z, U, V, W, color='b')
+        # ==y==
+        U, V, W = zip(*(r.as_matrix()[:, :, 1] / scale))
+        ax.quiver(x, y, z, U, V, W, color='g')
+        # ==x==
+        U, V, W = zip(*(r.as_matrix()[:, :, 0] / scale))
+        ax.quiver(x, y, z, U, V, W, color='r')
+
+
+
+        defal = 0.01
+        ax.set_xlim([-defal + x[-1], defal + x[-1]])
+        ax.set_ylim([-defal + y[-1], defal + y[-1]])
+        ax.set_zlim([-defal + z[-1], defal + z[-1]])
+        ax.set_xlabel('X___')
+        ax.set_ylabel('Y___')
+        ax.set_zlabel('Z___')
+        plt.show()
+        raise
         obs = env.reset()
         obs_robot = _flatten_obs(obs, obs_robot_list)
         obs_obj = _flatten_obs(obs, obs_obj_list)

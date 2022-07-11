@@ -18,9 +18,9 @@ dataset2 = CustomDataSet('np_x_sg_imp.npy','np_y_sg_imp.npy','./data_IGL/')
 
 grid_lr    = [0.0001, 0.00005, 0.00001]
 grid_wd    = [1e-4,1e-5,1e-6]
-grid_batch = [200,100,50]
+grid_batch = [100,50,25]
 
-for j,batch in enumerate(grid_batch):
+for x,batch in enumerate(grid_batch):
     train_loader1 = DataLoader(dataset1, shuffle = True,batch_size = 1000)
     train_loader2 = DataLoader(dataset2, shuffle = True,batch_size = batch)
 
@@ -32,8 +32,8 @@ for j,batch in enumerate(grid_batch):
     agent.to(device)
     # print(agent)
     # optimizer = torch.optim.Adam(agent.parameters(), lr=0.0001,weight_decay=1e-5)
-    for k,lr in enumerate(grid_lr):
-        for q, wd in enumerate(grid_wd):
+    for y,lr in enumerate(grid_lr):
+        for z, wd in enumerate(grid_wd):
             optimizer = torch.optim.Adam(agent.parameters(), lr=lr,weight_decay=wd)
             scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=50, eta_min=0)
 
@@ -60,4 +60,4 @@ for j,batch in enumerate(grid_batch):
                 scheduler.step()
                 print("========",i,"========")
                 print(temp_loss1,temp_loss2)
-            torch.save(agent.state_dict(), './model_save/IGL_sg_imp'+str(j)+str(k)+str(q))
+            torch.save(agent.state_dict(), './model_save/IGL_sg_imp'+str(x)+str(y)+str(z))
