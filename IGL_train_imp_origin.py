@@ -13,14 +13,11 @@ class CustomDataSet(Dataset):
         return len(self.x)
     def __getitem__(self,idx):
         return self.x[idx], self.y[idx]
-dataset1 = CustomDataSet('np_x_sg3_no_imp.npy','np_y_sg3_no_imp.npy','./data_IGL/')
-dataset2 = CustomDataSet('np_x_sg3_imp.npy','np_y_sg3_imp.npy','./data_IGL/')
+dataset1 = CustomDataSet('np_x_sg1_no_imp.npy','np_y_sg1_no_imp.npy','./data_IGL/')
+dataset2 = CustomDataSet('np_x_sg1_imp.npy','np_y_sg1_imp.npy','./data_IGL/')
 
-# grid_lr    = [0.00005,0.0001]
-# grid_wd    = [0,1e-4]
-# grid_batch = [100,100]
 grid_lr    = [0.0001, 0.00005, 0.00001]
-grid_wd    = [0, 1e-4,1e-5,1e-6]
+grid_wd    = [1e-4,1e-5,1e-6]
 grid_batch = [100,50,25]
 
 for x,batch in enumerate(grid_batch):
@@ -63,4 +60,4 @@ for x,batch in enumerate(grid_batch):
                 scheduler.step()
                 print("========",i,"========")
                 print(temp_loss1,temp_loss2)
-            torch.save(agent.state_dict(), './model_save/IGL_sg3_imp'+str(x)+str(y)+str(z))
+            torch.save(agent.state_dict(), './model_save/IGL_sg1_imp'+str(x)+str(y)+str(z))

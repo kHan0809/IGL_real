@@ -188,13 +188,14 @@ def collect_human_trajectory(env, device, arm, env_configuration):
 
 def get_current_stage(one_state):
     flag = 0
-
-    if (one_state[0] - one_state[9]) < 0.015 and (one_state[1] - one_state[10]) < 0.015 and (one_state[2] - one_state[11]) < 0.015:
-        flag += 1
-    if (one_state[0] - one_state[9]) < 0.015 and (one_state[1] - one_state[10]) < 0.015 and (one_state[2] - one_state[11]) < 0.015 and abs(one_state[7]<0.025):
-        flag += 1
-    if (one_state[0] - one_state[9]) < 0.015 and (one_state[1] - one_state[10]) < 0.015 and (one_state[2] - one_state[11]) < 0.015 and abs(one_state[11] - one_state[-5])>0.045:
-        flag += 1
+    inner = 0.021
+    inner_pro = 1.1
+    if abs(one_state[0] - one_state[9]) < inner and abs(one_state[1] - one_state[10]) < inner and abs(one_state[2] - one_state[11]) < inner:
+        flag = 1
+    if abs(one_state[0] - one_state[9]) < inner*inner_pro and abs(one_state[1] - one_state[10]) < inner*inner_pro and abs(one_state[2] - one_state[11]) < inner*inner_pro and abs(one_state[7]<0.024):
+        flag = 2
+    if abs(one_state[0] - one_state[9]) < inner*inner_pro and abs(one_state[1] - one_state[10]) < inner*inner_pro and abs(one_state[2] - one_state[11]) < inner*inner_pro and abs(one_state[7]<0.024) and abs(one_state[11] - one_state[-5])>0.035:
+        flag = 3
     return flag
 
 obs_list = ["robot0_eef_pos", "robot0_eef_quat", "robot0_gripper_qpos", "cubeA_pos", "cubeA_quat","cubeB_pos"]
@@ -368,6 +369,6 @@ if __name__ == "__main__":
         epi=collect_human_trajectory(env, device, args.arm, args.config)
         total_epi.append(epi)
 
-        with open('data_IGL_sg_1.pickle', 'wb') as f:
+        with open('data_IGL_sg_11.pickle', 'wb') as f:
             pickle.dump(total_epi, f, pickle.HIGHEST_PROTOCOL)
         # gather_demonstrations_as_hdf5(tmp_directory, new_dir, env_info)

@@ -11,7 +11,7 @@ def sub_goal_separator(sub_goal):
         if sub_goal[idx] != sub_goal[idx+1]:
             count += 1
             idx_list.append(idx)
-            if count == 2:
+            if count == 3:
                 break
         else:
             pass
@@ -242,14 +242,17 @@ def fix_traj(new_traj, traj1,traj2,coef):
 
 data_concat = []
 for pickle_data in os.listdir(os.getcwd()+'/data_IGL'):
-    if 'sg' in pickle_data:
+    if 'data_IGL_sg' in pickle_data:
         with open('./data_IGL/'+ pickle_data, 'rb') as f:
             data = pickle.load(f)
             data_concat.extend(data)
     else:
         pass
-print(len(data_concat))
-All_traj = []
+
+traj_sg0 = []
+traj_sg1 = []
+traj_sg2 = []
+traj_sg3 = []
 coefs = np.linspace(0,1,3,endpoint=True)
 for i in range(len(data_concat)-1):
     for j in range(i+1,len(data_concat)):
@@ -266,50 +269,46 @@ for i in range(len(data_concat)-1):
         idx_sub_traj2 = sub_goal_separator(sub_goal2)
 
 
-        robot_candi1 = obs_robot1[:idx_sub_traj1[0]+1]
-        robot_candi2 = obs_robot2[:idx_sub_traj2[0]+1]
-        obj_candi1   = obs_obj1[:idx_sub_traj1[0]+1]
-        obj_candi2   = obs_obj2[:idx_sub_traj2[0]+1]
-        for coef in coefs:
-            fixed_traj = traj_interpolation(robot_candi1,robot_candi2,obj_candi1,obj_candi2,sub_goal1[idx_sub_traj1[0]],coef) # 여기 sub goal은 계속 바뀌어야 된다~~0 나중에 바꿔주셈
-            # fixed_traj = fix_traj(new_traj,robot_candi1,robot_candi2,coef)
-            All_traj.append(fixed_traj)
+        for k in range(len(idx_sub_traj1)+1):
+            if k == 0:
+                robot_candi1 = obs_robot1[:idx_sub_traj1[k]+1]
+                robot_candi2 = obs_robot2[:idx_sub_traj2[k]+1]
+                obj_candi1   = obs_obj1[:idx_sub_traj1[k]+1]
+                obj_candi2   = obs_obj2[:idx_sub_traj2[k]+1]
+            elif k == (len(idx_sub_traj1)):
+                robot_candi1 = obs_robot1[idx_sub_traj1[k-1]+1:]
+                robot_candi2 = obs_robot2[idx_sub_traj2[k-1]+1:]
+                obj_candi1   = obs_obj1[idx_sub_traj1[k-1]+1:]
+                obj_candi2   = obs_obj2[idx_sub_traj2[k-1]+1:]
+            else:
+                robot_candi1 = obs_robot1[idx_sub_traj1[k-1]+1:idx_sub_traj1[k]+1]
+                robot_candi2 = obs_robot2[idx_sub_traj2[k-1]+1:idx_sub_traj2[k]+1]
+                obj_candi1   = obs_obj1[idx_sub_traj1[k-1]+1:idx_sub_traj1[k]+1]
+                obj_candi2   = obs_obj2[idx_sub_traj2[k-1]+1:idx_sub_traj2[k]+1]
 
-print(len(All_traj))
-with open('./data_IGL/Inter_sg_traj_middle.pickle', 'wb') as f:
-    pickle.dump(All_traj, f, pickle.HIGHEST_PROTOCOL)
+            for coef in coefs:
+                fixed_traj = traj_interpolation(robot_candi1,robot_candi2,obj_candi1,obj_candi2,k,coef) # 여기 sub goal은 계속 바뀌어야 된다~~0 나중에 바꿔주셈
+                # fixed_traj = fix_traj(new_traj,robot_candi1,robot_candi2,coef)
+            if k == 0:
+                traj_sg0.append(fixed_traj)
+            elif k == 1:
+                traj_sg1.append(fixed_traj)
+            elif k == 2:
+                traj_sg2.append(fixed_traj)
+            elif k == 3:
+                traj_sg3.append(fixed_traj)
 
-#=========================그래프 그리는거야~~===================#
-# import matplotlib.pyplot as plt
-# from scipy.spatial.transform import Rotation as R
-# fig = plt.figure()
-# ax = fig.add_subplot(111, projection='3d')
-#
-# z_axis_scale = 80
-# X, Y, Z = zip(*robot_candi1[:,:3])
-# ax.scatter(X,Y,Z)
-# r = R.from_quat(robot_candi1[:, 3:7])
-# U,V,W=zip(*(r.as_matrix()[:,:,2]/z_axis_scale))
-# ax.quiver(X,Y,Z,U,V,W)
-# # ax.quiver(X[-1],Y[-1],Z[-1],U[-1],V[-1],W[-1],color='r')
-#
-# X, Y, Z = zip(*robot_candi2[:,:3])
-# ax.scatter(X,Y,Z,color='r')
-# r = R.from_quat(robot_candi2[:, 3:7])
-# U,V,W=zip(*(r.as_matrix()[:,:,2]/z_axis_scale))
-# ax.quiver(X,Y,Z,U,V,W,color='r')
-#
-# X, Y, Z = zip(*new_traj[:,:3])
-# ax.scatter(X,Y,Z,color='g')
-# r = R.from_quat(new_traj[:, 3:7])
-# U,V,W=zip(*(r.as_matrix()[:,:,2]/z_axis_scale))
-# ax.quiver(X,Y,Z,U,V,W,color='g')
-#
-# X, Y, Z = zip(*fixed_traj[:,:3])
-# ax.scatter(X,Y,Z,color='m')
-# r = R.from_quat(fixed_traj[:, 3:7])
-# U,V,W=zip(*(r.as_matrix()[:,:,2]/z_axis_scale))
-# ax.quiver(X,Y,Z,U,V,W,color='m')
-#
-# plt.show()
-#==================================================#
+
+print(len(traj_sg0))
+print(len(traj_sg1))
+print(len(traj_sg2))
+print(len(traj_sg3))
+
+with open('./data_IGL/Inter_traj_middle_sg0.pickle', 'wb') as f:
+    pickle.dump(traj_sg0, f, pickle.HIGHEST_PROTOCOL)
+with open('./data_IGL/Inter_traj_middle_sg1.pickle', 'wb') as f:
+    pickle.dump(traj_sg1, f, pickle.HIGHEST_PROTOCOL)
+with open('./data_IGL/Inter_traj_middle_sg2.pickle', 'wb') as f:
+    pickle.dump(traj_sg2, f, pickle.HIGHEST_PROTOCOL)
+with open('./data_IGL/Inter_traj_middle_sg3.pickle', 'wb') as f:
+    pickle.dump(traj_sg3, f, pickle.HIGHEST_PROTOCOL)

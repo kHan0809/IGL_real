@@ -231,7 +231,7 @@ def fix_traj(new_traj, traj1,traj2,coef):
 data_concat = []
 for pickle_data in os.listdir(os.getcwd()+'/data_IGL'):
     # if 'IGL' in pickle_data:
-    if 'Inter_sg_traj_middle' in pickle_data:
+    if 'Inter_traj_middle_sg3' in pickle_data:
         with open('./data_IGL/'+ pickle_data, 'rb') as f:
             data = pickle.load(f)
             data_concat.extend(data)
@@ -242,7 +242,7 @@ All_traj = []
 coefs = np.linspace(0,1,3,endpoint=True)
 print(len(data_concat))
 for i in range(len(data_concat)-1):
-    for j in range(i+len(data_concat)//2+len(data_concat)//3+20,len(data_concat)):
+    for j in range(i+len(data_concat)//2,len(data_concat)):
         choice=np.array([i,j])
 
         obs_robot1 = np.array(data_concat[choice[0]]['obs_robot'])
@@ -252,6 +252,7 @@ for i in range(len(data_concat)-1):
 
         sub_goal1 = np.array(data_concat[choice[0]]['sg'])
         sub_goal2 = np.array(data_concat[choice[1]]['sg'])
+
 
 
         robot_candi1 = obs_robot1
@@ -264,39 +265,5 @@ for i in range(len(data_concat)-1):
             All_traj.append(fixed_traj)
 
 print(len(All_traj))
-with open('./data_IGL/Inter_sg_traj_using_middle.pickle', 'wb') as f:
+with open('./data_IGL/Inter_traj_sg3_using_middle.pickle', 'wb') as f:
     pickle.dump(All_traj, f, pickle.HIGHEST_PROTOCOL)
-#=========================그래프 그리는거야~~===================#
-# import matplotlib.pyplot as plt
-# from scipy.spatial.transform import Rotation as R
-# fig = plt.figure()
-# ax = fig.add_subplot(111, projection='3d')
-#
-# z_axis_scale = 80
-# X, Y, Z = zip(*robot_candi1[:,:3])
-# ax.scatter(X,Y,Z)
-# r = R.from_quat(robot_candi1[:, 3:7])
-# U,V,W=zip(*(r.as_matrix()[:,:,2]/z_axis_scale))
-# ax.quiver(X,Y,Z,U,V,W)
-# # ax.quiver(X[-1],Y[-1],Z[-1],U[-1],V[-1],W[-1],color='r')
-#
-# X, Y, Z = zip(*robot_candi2[:,:3])
-# ax.scatter(X,Y,Z,color='r')
-# r = R.from_quat(robot_candi2[:, 3:7])
-# U,V,W=zip(*(r.as_matrix()[:,:,2]/z_axis_scale))
-# ax.quiver(X,Y,Z,U,V,W,color='r')
-#
-# X, Y, Z = zip(*new_traj[:,:3])
-# ax.scatter(X,Y,Z,color='g')
-# r = R.from_quat(new_traj[:, 3:7])
-# U,V,W=zip(*(r.as_matrix()[:,:,2]/z_axis_scale))
-# ax.quiver(X,Y,Z,U,V,W,color='g')
-#
-# X, Y, Z = zip(*fixed_traj[:,:3])
-# ax.scatter(X,Y,Z,color='m')
-# r = R.from_quat(fixed_traj[:, 3:7])
-# U,V,W=zip(*(r.as_matrix()[:,:,2]/z_axis_scale))
-# ax.quiver(X,Y,Z,U,V,W,color='m')
-#
-# plt.show()
-#==================================================#
