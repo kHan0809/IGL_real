@@ -231,7 +231,7 @@ def fix_traj(new_traj, traj1,traj2,coef):
 data_concat = []
 for pickle_data in os.listdir(os.getcwd()+'/data_IGL'):
     # if 'IGL' in pickle_data:
-    if 'Inter_traj_middle_sg3' in pickle_data:
+    if 'Inter_mid_sg1' in pickle_data:
         with open('./data_IGL/'+ pickle_data, 'rb') as f:
             data = pickle.load(f)
             data_concat.extend(data)
@@ -240,9 +240,12 @@ for pickle_data in os.listdir(os.getcwd()+'/data_IGL'):
 
 All_traj = []
 coefs = np.linspace(0,1,3,endpoint=True)
+print(coefs)
 print(len(data_concat))
+# middle_point = len(data_concat)//2
+middle_point = 1
 for i in range(len(data_concat)-1):
-    for j in range(i+len(data_concat)//2,len(data_concat)):
+    for j in range(i+middle_point,len(data_concat)):
         choice=np.array([i,j])
 
         obs_robot1 = np.array(data_concat[choice[0]]['obs_robot'])
@@ -259,11 +262,23 @@ for i in range(len(data_concat)-1):
         robot_candi2 = obs_robot2
         obj_candi1   = obs_obj1
         obj_candi2   = obs_obj2
-        for coef in coefs:
-            fixed_traj = traj_interpolation(robot_candi1,robot_candi2,obj_candi1,obj_candi2,sub_goal1[0],coef) # 여기 sub goal은 계속 바뀌어야 된다~~0 나중에 바꿔주셈
-            # fixed_traj = fix_traj(new_traj,robot_candi1,robot_candi2,coef)
-            All_traj.append(fixed_traj)
+        if i == 0 and j == middle_point:
+            for coef in coefs:
+                fixed_traj = traj_interpolation(robot_candi1,robot_candi2,obj_candi1,obj_candi2,sub_goal1[0],coef) # 여기 sub goal은 계속 바뀌어야 된다~~0 나중에 바꿔주셈
+                # fixed_traj = fix_traj(new_traj,robot_candi1,robot_candi2,coef)
+                All_traj.append(fixed_traj)
+        elif i == 0 and j != middle_point:
+            for coef in coefs[1:]:
+                fixed_traj = traj_interpolation(robot_candi1,robot_candi2,obj_candi1,obj_candi2,sub_goal1[0],coef) # 여기 sub goal은 계속 바뀌어야 된다~~0 나중에 바꿔주셈
+                # fixed_traj = fix_traj(new_traj,robot_candi1,robot_candi2,coef)
+                All_traj.append(fixed_traj)
+        else:
+            for coef in coefs[1:-1]:
+                fixed_traj = traj_interpolation(robot_candi1,robot_candi2,obj_candi1,obj_candi2,sub_goal1[0],coef) # 여기 sub goal은 계속 바뀌어야 된다~~0 나중에 바꿔주셈
+                # fixed_traj = fix_traj(new_traj,robot_candi1,robot_candi2,coef)
+                All_traj.append(fixed_traj)
+
 
 print(len(All_traj))
-with open('./data_IGL/Inter_traj_sg3_using_middle.pickle', 'wb') as f:
+with open('./data_IGL/Inter_using_mid_sg1.pickle', 'wb') as f:
     pickle.dump(All_traj, f, pickle.HIGHEST_PROTOCOL)

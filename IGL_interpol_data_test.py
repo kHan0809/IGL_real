@@ -242,7 +242,7 @@ def fix_traj(new_traj, traj1,traj2,coef):
 
 data_concat = []
 for pickle_data in os.listdir(os.getcwd()+'/data_IGL'):
-    if 'Inter_traj_midel_no_fix' in pickle_data:
+    if 'Inter_traj_middle_sg0' in pickle_data:
     # if 'middle' in pickle_data:
         with open('./data_IGL/'+ pickle_data, 'rb') as f:
             data = pickle.load(f)
@@ -257,9 +257,9 @@ ax = fig.add_subplot(111, projection='3d')
 
 All_traj = []
 coefs = np.linspace(0,1,11,endpoint=True)
-
+print(len(data))
 for i in range(10,len(data_concat)-1):
-    for j in range(i+60+1,len(data_concat)):
+    for j in range(i+64,len(data_concat)):
         choice=np.array([i,j])
 
         obs_robot1 = np.array(data_concat[choice[0]]['obs_robot'])
@@ -271,7 +271,12 @@ for i in range(10,len(data_concat)-1):
         sub_goal2 = np.array(data_concat[choice[1]]['sg'])
         # idx_sub_traj1 = sub_goal_separator(sub_goal1)
         # idx_sub_traj2 = sub_goal_separator(sub_goal2)
-
+        print(".............")
+        obs_robot1 = np.array(data_concat[71]['obs_robot'])[:5]
+        print(obs_robot1)
+        obs_robot1 = np.array(data_concat[75]['obs_robot'])[:5]
+        print(obs_robot1)
+        raise
 
         robot_candi1 = obs_robot1
         robot_candi2 = obs_robot2
@@ -294,9 +299,10 @@ for i in range(10,len(data_concat)-1):
 
             print(robot_candi2[-1,:3]-np.array(fixed_traj["obs_robot"])[-1,:3])
 
-            x,y,z = zip(*np.array(fixed_traj["obs_robot"])[-1:,:3])
+            num = -1
+            x,y,z = zip(*np.array(fixed_traj["obs_robot"])[num:,:3])
             ax.scatter(x, y, z, color='m', alpha=1.0)
-            r = R.from_quat(np.array(fixed_traj["obs_robot"])[-1:,3:7])
+            r = R.from_quat(np.array(fixed_traj["obs_robot"])[num:,3:7])
             # ==z==
             U, V, W = zip(*(r.as_matrix()[:, :, 2] / 200))
             ax.quiver(x, y, z, U, V, W, color='b')
@@ -308,9 +314,9 @@ for i in range(10,len(data_concat)-1):
             ax.quiver(x, y, z, U, V, W, color='r')
 
 
-            x,y,z = zip(*np.array(fixed_traj["obs_obj"])[-1:,:3])
+            x,y,z = zip(*np.array(fixed_traj["obs_obj"])[num:,:3])
             ax.scatter(x,y,z,color='r',alpha=0.5)
-            r = R.from_quat(np.array(fixed_traj["obs_obj"])[-1:,3:7])
+            r = R.from_quat(np.array(fixed_traj["obs_obj"])[num:,3:7])
             #==z==
             U,V,W=zip(*(r.as_matrix()[:,:,2]/200))
             ax.quiver(x,y,z,U,V,W,color='b')
@@ -323,9 +329,9 @@ for i in range(10,len(data_concat)-1):
 
 
 
-            x, y, z = zip(*np.array(obj_candi1[-1:, :3]))
+            x, y, z = zip(*np.array(obj_candi1[num:, :3]))
             ax.scatter(x, y, z, color='g', alpha=1.0)
-            r = R.from_quat(obj_candi1[-1:, 3:7])
+            r = R.from_quat(obj_candi1[num:, 3:7])
             #==z==
             U,V,W=zip(*(r.as_matrix()[:,:,2]/200))
             ax.quiver(x,y,z,U,V,W,color='b')
@@ -336,9 +342,9 @@ for i in range(10,len(data_concat)-1):
             U,V,W=zip(*(r.as_matrix()[:,:,0]/200))
             ax.quiver(x,y,z,U,V,W,color='r')
 
-            x, y, z = zip(*np.array(obj_candi2[-1:, :3]))
+            x, y, z = zip(*np.array(obj_candi2[num:, :3]))
             ax.scatter(x, y, z, color='b', alpha=1.0)
-            r = R.from_quat(obj_candi2[-1:, 3:7])
+            r = R.from_quat(obj_candi2[num:, 3:7])
             #==z==
             U,V,W=zip(*(r.as_matrix()[:,:,2]/200))
             ax.quiver(x,y,z,U,V,W,color='b')
@@ -349,10 +355,7 @@ for i in range(10,len(data_concat)-1):
             U,V,W=zip(*(r.as_matrix()[:,:,0]/200))
             ax.quiver(x,y,z,U,V,W,color='r')
 
-            defal = 0.05
-            x, y, z = zip(*np.array(fixed_traj["obs_obj"])[-1:, :3])
-            print(x)
-            print(type(x))
+            defal = 0.06
 
             ax.set_xlim([-defal+x[0], defal+x[0]])
             ax.set_ylim([-defal+y[0], defal+y[0]])
@@ -361,6 +364,34 @@ for i in range(10,len(data_concat)-1):
             ax.set_ylabel('Y___')
             ax.set_zlabel('Z___')
             All_traj.append(fixed_traj)
+
+        # x, y, z = zip(*np.array(robot_candi1[num:, :3]))
+        # ax.scatter(x, y, z, color='b', alpha=1.0)
+        # r = R.from_quat(robot_candi1[num:, 3:7])
+        # # ==z==
+        # U, V, W = zip(*(r.as_matrix()[:, :, 2] / 200))
+        # ax.quiver(x, y, z, U, V, W, color='b')
+        # # ==y==
+        # U, V, W = zip(*(r.as_matrix()[:, :, 1] / 200))
+        # ax.quiver(x, y, z, U, V, W, color='g')
+        # # ==x==
+        # U, V, W = zip(*(r.as_matrix()[:, :, 0] / 200))
+        # ax.quiver(x, y, z, U, V, W, color='r')
+        #
+        #
+        # x, y, z = zip(*np.array(robot_candi2[num:, :3]))
+        # ax.scatter(x, y, z, color='b', alpha=1.0)
+        # r = R.from_quat(robot_candi2[num:, 3:7])
+        # # ==z==
+        # U, V, W = zip(*(r.as_matrix()[:, :, 2] / 200))
+        # ax.quiver(x, y, z, U, V, W, color='b')
+        # # ==y==
+        # U, V, W = zip(*(r.as_matrix()[:, :, 1] / 200))
+        # ax.quiver(x, y, z, U, V, W, color='g')
+        # # ==x==
+        # U, V, W = zip(*(r.as_matrix()[:, :, 0] / 200))
+        # ax.quiver(x, y, z, U, V, W, color='r')
+
 
         plt.show()
         raise

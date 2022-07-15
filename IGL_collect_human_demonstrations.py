@@ -192,9 +192,9 @@ def get_current_stage(one_state):
     inner_pro = 1.1
     if abs(one_state[0] - one_state[9]) < inner and abs(one_state[1] - one_state[10]) < inner and abs(one_state[2] - one_state[11]) < inner:
         flag = 1
-    if abs(one_state[0] - one_state[9]) < inner*inner_pro and abs(one_state[1] - one_state[10]) < inner*inner_pro and abs(one_state[2] - one_state[11]) < inner*inner_pro and abs(one_state[7]<0.024):
+    if abs(one_state[0] - one_state[9]) < inner*inner_pro and abs(one_state[1] - one_state[10]) < inner*inner_pro and abs(one_state[2] - one_state[11]) < inner*inner_pro and abs(one_state[7]<0.026):
         flag = 2
-    if abs(one_state[0] - one_state[9]) < inner*inner_pro and abs(one_state[1] - one_state[10]) < inner*inner_pro and abs(one_state[2] - one_state[11]) < inner*inner_pro and abs(one_state[7]<0.024) and abs(one_state[11] - one_state[-5])>0.035:
+    if abs(one_state[0] - one_state[9]) < inner*inner_pro and abs(one_state[1] - one_state[10]) < inner*inner_pro and abs(one_state[2] - one_state[11]) < inner*inner_pro and abs(one_state[7]<0.026) and abs(one_state[11] - one_state[-5])>0.035:
         flag = 3
     return flag
 
@@ -292,7 +292,7 @@ if __name__ == "__main__":
         type=str,
         default=os.path.join(suite.models.assets_root, "demonstrations"),
     )
-    parser.add_argument("--environment", type=str, default="Stack")
+    parser.add_argument("--environment", type=str, default="Stack_with_site")
     parser.add_argument("--robots", nargs="+", type=str, default="Panda", help="Which robot(s) to use in the env")
     parser.add_argument(
         "--config", type=str, default="single-arm-opposed", help="Specified environment configuration if necessary"
@@ -369,6 +369,6 @@ if __name__ == "__main__":
         epi=collect_human_trajectory(env, device, args.arm, args.config)
         total_epi.append(epi)
 
-        with open('data_IGL_sg_11.pickle', 'wb') as f:
+        with open('data_IGL_2.pickle', 'wb') as f:
             pickle.dump(total_epi, f, pickle.HIGHEST_PROTOCOL)
         # gather_demonstrations_as_hdf5(tmp_directory, new_dir, env_info)
