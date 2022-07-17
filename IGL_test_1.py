@@ -3,7 +3,7 @@ from robosuite.controllers import load_controller_config
 from robosuite.utils.input_utils import *
 from Model.Model import IGL, InvDyn_add, IGL_large
 import torch
-
+from robosuite.wrappers import VisualizationWrapper
 
 def get_current_stage(one_state):
     flag = 0
@@ -36,7 +36,7 @@ if __name__ == "__main__":
     # Choose environment and add it to options
     # options["env_name"] = "Door"
     # options["env_name"] = choose_environment()
-    options["env_name"] = "Stack"
+    options["env_name"] = "Stack_with_site"
 
     # If a multi-arm environment has been chosen, choose configuration and appropriate robot(s)
     if "TwoArm" in options["env_name"]:
@@ -103,6 +103,7 @@ if __name__ == "__main__":
     # current_subgoal = np.array([0])
 
     env.viewer.set_camera(camera_id=0)
+    env = VisualizationWrapper(env)
 
     # Get action limits
     low, high = env.action_spec
@@ -110,7 +111,7 @@ if __name__ == "__main__":
     all_dim = 24 # 9 + 13 + 1
     robot_dim = 9
     igl = IGL_large(all_dim, robot_dim, 'cpu')
-    igl.load_state_dict(torch.load('./model_save/IGL_sg_imp222'))
+    igl.load_state_dict(torch.load('./model_save/IGL_sg0_imp221'))
 
     state_dim = 32
     next_state_dim = 9
@@ -132,7 +133,7 @@ if __name__ == "__main__":
             next_=igl(torch.FloatTensor(one_state).unsqueeze(0))
             # action=Inv.forward(torch.FloatTensor(obs_robot).unsqueeze(0),next_)
             next = next_.squeeze(0).detach().numpy()
-            action_pos = np.array([(next[0]-obs_robot_pos[0]),(next[1]-obs_robot_pos[1]),(next[2]-obs_robot_pos[2])])*10
+            action_pos = np.array([(next[0]-obs_robot_pos[0]),(next[1]-obs_robot_pos[1]),(next[2]-obs_robot_pos[2])])*5
             # action_pos = (obs_obj[:3] - obs_robot_pos[:3])
 
             next_r = R.from_quat(next[3:7])
