@@ -229,9 +229,10 @@ def fix_traj(new_traj, traj1,traj2,coef):
 
 
 data_concat = []
+subgoal = '3'
 for pickle_data in os.listdir(os.getcwd()+'/data_IGL'):
     # if 'IGL' in pickle_data:
-    if 'Inter_mid_sg3' in pickle_data:
+    if 'Inter_mid_sg'+subgoal in pickle_data:
         with open('./data_IGL/'+ pickle_data, 'rb') as f:
             data = pickle.load(f)
             data_concat.extend(data)
@@ -239,7 +240,7 @@ for pickle_data in os.listdir(os.getcwd()+'/data_IGL'):
         pass
 
 All_traj = []
-coefs = np.linspace(0,1,6,endpoint=True)
+coefs = np.linspace(0,1,4,endpoint=True)
 print(coefs)
 print(len(data_concat))
 # middle_point = len(data_concat)//2
@@ -280,5 +281,5 @@ for i in range(len(data_concat)-1):
 
 
 print(len(All_traj))
-with open('./data_IGL/Inter_using_mid_sg3.pickle', 'wb') as f:
+with open('./data_IGL/Inter_using_mid_sg'+subgoal+'.pickle', 'wb') as f:
     pickle.dump(All_traj, f, pickle.HIGHEST_PROTOCOL)

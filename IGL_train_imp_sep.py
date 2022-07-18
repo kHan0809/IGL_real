@@ -1,6 +1,6 @@
 import pickle
 import torch
-from Model.Model import IGL, IGL_large
+from Model.Model import IGL, IGL_large_sep
 import numpy as np
 from torch.utils.data import DataLoader, Dataset
 import torch.nn as nn
@@ -17,9 +17,9 @@ subgoal = '0'
 dataset1 = CustomDataSet('np_x_sg'+subgoal+'_no_imp.npy','np_y_sg'+subgoal+'_no_imp.npy','./data_IGL/')
 dataset2 = CustomDataSet('np_x_sg'+subgoal+'_imp.npy','np_y_sg'+subgoal+'_imp.npy','./data_IGL/')
 
-grid_lr    = [0.0001, 0.00005, 0.00001]
+grid_lr    = [0.0001, 0.00005]
 grid_wd    = [1e-4,1e-5,1e-6]
-grid_batch = [50,100,200]
+grid_batch = [100,200,400]
 
 for x,batch in enumerate(grid_batch):
     train_loader1 = DataLoader(dataset1, shuffle = True,batch_size = 1000)
@@ -29,7 +29,7 @@ for x,batch in enumerate(grid_batch):
     all_dim = 24
     robot_dim = 9
     device = "cuda"
-    agent=IGL_large(all_dim,robot_dim,device)
+    agent=IGL_large_sep(all_dim,robot_dim,device)
     agent.to(device)
     # print(agent)
     # optimizer = torch.optim.Adam(agent.parameters(), lr=0.0001,weight_decay=1e-5)
@@ -61,4 +61,4 @@ for x,batch in enumerate(grid_batch):
                 scheduler.step()
                 print("========",i,"========")
                 print(temp_loss1,temp_loss2)
-            torch.save(agent.state_dict(), './model_save/IGL_sg'+subgoal+'_imp'+str(x)+str(y)+str(z))
+            torch.save(agent.state_dict(), './model_save/SEP_IGL_sg'+subgoal+'_imp'+str(x)+str(y)+str(z))

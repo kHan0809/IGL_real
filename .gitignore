@@ -2,5 +2,6 @@
 *.json
 *.pth
 *.npy
-
+*.pickle
 __pycache__
+/model_save

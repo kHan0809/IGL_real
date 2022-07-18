@@ -22,7 +22,7 @@ new_x_import = []
 new_y_import = []
 for traj in data:
     for i in range(len(traj["obs_robot"])-1):
-        if i < (len(traj["obs_robot"])-1)*0.7:
+        if i < (len(traj["obs_robot"])-1)*0.9:
             new_x.append(traj["obs_robot"][i] + traj["obs_obj"][i] + [traj["sg"][i]])
             new_y.append(traj["obs_robot"][i+1])
         else:

@@ -1,7 +1,7 @@
 import numpy as np
 from robosuite.controllers import load_controller_config
 from robosuite.utils.input_utils import *
-from Model.Model import IGL, InvDyn_add, IGL_large
+from Model.Model import IGL, InvDyn_add, IGL_large, IGL_large_sep
 import torch
 from robosuite.wrappers import VisualizationWrapper
 
@@ -111,7 +111,8 @@ if __name__ == "__main__":
     all_dim = 24 # 9 + 13 + 1
     robot_dim = 9
     igl = IGL_large(all_dim, robot_dim, 'cpu')
-    igl.load_state_dict(torch.load('./model_save/IGL_sg0_imp221'))
+    # igl = IGL_large_sep(all_dim, robot_dim, 'cpu')
+    igl.load_state_dict(torch.load('./model_save/IGL_sg0_imp202'))
 
     state_dim = 32
     next_state_dim = 9

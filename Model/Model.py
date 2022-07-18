@@ -343,6 +343,50 @@ class IGL_large(nn.Module):
         # _input=torch.cat([state, stage],dim=1)
         output = self.net(state)
         return output
+
+class IGL_large_sep(nn.Module):
+    def __init__(self, all_dim, robot_dim, device):
+        super(IGL_large_sep, self).__init__()
+        self.device = device
+        self.apply(weight_init)
+
+        self.net = nn.Sequential(
+            nn.Linear(all_dim, 512),
+            nn.ReLU(),
+            nn.Linear(512, 512),
+            nn.BatchNorm1d(512),
+            nn.ReLU(),
+            nn.Linear(512, 256),
+            nn.BatchNorm1d(256),
+            nn.ReLU()
+        )
+        self.net_pos = nn.Sequential(
+        nn.Linear(256, 256),
+        nn.BatchNorm1d(256),
+        nn.ReLU(),
+        nn.Linear(256, 3)
+        )
+        self.net_quat = nn.Sequential(
+        nn.Linear(256, 256),
+        nn.BatchNorm1d(256),
+        nn.ReLU(),
+        nn.Linear(256, 4)
+        )
+        self.net_grip = nn.Sequential(
+        nn.Linear(256, 2)
+        )
+
+    def forward(self, state):
+        # _input=torch.cat([state, stage],dim=1)
+        common = self.net(state)
+        pos = self.net_pos(common)
+        quaternion = self.net_quat(common)
+        quaternion_norm = torch.norm(quaternion,dim=1).unsqueeze(1)
+        quaternion = quaternion/quaternion_norm
+        grip = self.net_grip(common)
+        output = torch.concat((pos,quaternion,grip),1)
+        return output
+
 class InvDyn(nn.Module):
     def __init__(self, state_dim, action_dim, device):
         super(InvDyn, self).__init__()
