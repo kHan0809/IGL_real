@@ -112,7 +112,8 @@ if __name__ == "__main__":
     robot_dim = 9
     igl = IGL_large(all_dim, robot_dim, 'cpu')
     # igl = IGL_large_sep(all_dim, robot_dim, 'cpu')
-    igl.load_state_dict(torch.load('./model_save/IGL_sg0_imp202'))
+    # igl.load_state_dict(torch.load('./model_save/SEP_IGL_sg0_imp000'))
+    igl.load_state_dict(torch.load('./model_save/IGL_sg0_imp000'))
 
     state_dim = 32
     next_state_dim = 9
@@ -134,15 +135,16 @@ if __name__ == "__main__":
             next_=igl(torch.FloatTensor(one_state).unsqueeze(0))
             # action=Inv.forward(torch.FloatTensor(obs_robot).unsqueeze(0),next_)
             next = next_.squeeze(0).detach().numpy()
-            action_pos = np.array([(next[0]-obs_robot_pos[0]),(next[1]-obs_robot_pos[1]),(next[2]-obs_robot_pos[2])])*5
+            action_pos = np.array([(next[0]-obs_robot_pos[0]),(next[1]-obs_robot_pos[1]),(next[2]-obs_robot_pos[2])])*3
             # action_pos = (obs_obj[:3] - obs_robot_pos[:3])
 
             next_r = R.from_quat(next[3:7])
             curr_r = R.from_quat(obs_robot_pos[3:7])
             next_euler = next_r.as_euler('zyz',degrees=False)
             curr_euler = curr_r.as_euler('zyz',degrees=False)
-            action_rot  = next_euler-curr_euler
+            action_rot  = (next_euler-curr_euler)
             action_grip = np.array([next[-1]  - obs_robot_pos[-1]])
+
 
             if action_rot[0]>2.0:
                 action_rot[0] -=np.pi*2
@@ -158,7 +160,9 @@ if __name__ == "__main__":
                 action_rot[2] -=np.pi*2
             elif action_rot[2]<-2.0:
                 action_rot[2] += np.pi * 2
+            print(action_rot)
             print("===============")
+            # action_rot *=2
 
             action = np.concatenate((action_pos,action_rot,action_grip))
 

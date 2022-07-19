@@ -242,7 +242,7 @@ def fix_traj(new_traj, traj1,traj2,coef):
 
 data_concat = []
 for pickle_data in os.listdir(os.getcwd()+'/data_IGL'):
-    if 'data_IGL_' in pickle_data:
+    if 'data_IGL_sg4_' in pickle_data:
         with open('./data_IGL/'+ pickle_data, 'rb') as f:
             data = pickle.load(f)
             data_concat.extend(data)
@@ -254,6 +254,7 @@ traj_sg1 = []
 traj_sg2 = []
 traj_sg3 = []
 print(len(data_concat))
+raise
 coefs = np.linspace(0,1,3,endpoint=True)
 for i in range(len(data_concat)-1):
     for j in range(i+1,len(data_concat)):

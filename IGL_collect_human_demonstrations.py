@@ -122,12 +122,17 @@ def collect_human_trajectory(env, device, arm, env_configuration):
 
     obs_robot_list = ["robot0_eef_pos", "robot0_eef_quat", "robot0_gripper_qpos"]
     obs_obj_list  = ["cubeA_pos", "cubeA_quat","cubeB_pos","cubeB_quat"]
-    obs_robot = _flatten_obs(obs,obs_robot_list)
-    obs_obj = _flatten_obs(obs,obs_obj_list)
 
     ep_obs_robot, ep_obs_obj, ep_subgoal ,ep_action = [], [], [], []
-        
 
+    obs_robot = _flatten_obs(obs, obs_robot_list)
+    obs_obj   = _flatten_obs(obs, obs_obj_list)
+    one_state = np.concatenate((obs_robot, obs_obj))
+    current_subgoal = get_current_stage(one_state,0,obs)
+
+    ep_obs_robot.append(obs_robot)
+    ep_obs_obj.append(obs_obj)
+    ep_subgoal.append(current_subgoal)
     # Loop until we get a reset from the input or the task completes
     while True:
         # Set active robot
@@ -150,18 +155,15 @@ def collect_human_trajectory(env, device, arm, env_configuration):
         print("================")
         obs, reward, done, info = env.step(action)
 
-        ep_obs_robot.append(obs_robot)
-        ep_obs_obj.append(obs_obj)
-        one_state = np.concatenate((obs_robot, obs_obj))
-        # print(obs)
-        # print("obs_robot : ", obs_robot)
-        # print("obs_obj   : ", obs_obj)
-        current_subgoal = get_current_stage(one_state)
-        print(current_subgoal)
-        ep_subgoal.append(current_subgoal)
-
         obs_robot = _flatten_obs(obs, obs_robot_list)
         obs_obj = _flatten_obs(obs, obs_obj_list)
+        one_state = np.concatenate((obs_robot, obs_obj))
+        current_subgoal = get_current_stage(one_state,current_subgoal,obs)
+
+        ep_obs_robot.append(obs_robot)
+        ep_obs_obj.append(obs_obj)
+        ep_subgoal.append(current_subgoal)
+        print(current_subgoal)
 
         ep_action.append(action)
 
@@ -186,16 +188,19 @@ def collect_human_trajectory(env, device, arm, env_configuration):
     episode = dict(obs_robot=ep_obs_robot,obs_obj=ep_obs_obj,sg=ep_subgoal,a=ep_action)
     return episode
 
-def get_current_stage(one_state):
-    flag = 0
-    inner = 0.021
-    inner_pro = 1.1
-    if abs(one_state[0] - one_state[9]) < inner and abs(one_state[1] - one_state[10]) < inner and abs(one_state[2] - one_state[11]) < inner:
-        flag = 1
-    if abs(one_state[0] - one_state[9]) < inner*inner_pro and abs(one_state[1] - one_state[10]) < inner*inner_pro and abs(one_state[2] - one_state[11]) < inner*inner_pro and abs(one_state[7]<0.026):
-        flag = 2
-    if abs(one_state[0] - one_state[9]) < inner*inner_pro and abs(one_state[1] - one_state[10]) < inner*inner_pro and abs(one_state[2] - one_state[11]) < inner*inner_pro and abs(one_state[7]<0.026) and abs(one_state[11] - one_state[-5])>0.035:
-        flag = 3
+def get_current_stage(one_state,curt_subgoal,obs):
+    flag = curt_subgoal
+    inner = 0.0075
+    inner2 = 0.02
+    inner_pro = 1.0
+    if abs(one_state[0] - one_state[9]) < inner and abs(one_state[1] - one_state[10]) < inner and abs(one_state[2] - one_state[11]) < inner and flag == 0:
+        flag += 1
+    if abs(one_state[0] - one_state[9]) < inner2*inner_pro and abs(one_state[1] - one_state[10]) < inner2*inner_pro and abs(one_state[2] - one_state[11]) < inner2*inner_pro and abs(one_state[7]<0.0215) and flag == 1:
+        flag += 1
+    if abs(one_state[0] - one_state[9]) < inner2*inner_pro and abs(one_state[1] - one_state[10]) < inner2*inner_pro and abs(one_state[2] - one_state[11]) < inner2*inner_pro and abs(one_state[7]<0.0215) and abs(one_state[11] - one_state[-5])>0.070 and flag==2:
+        flag += 1
+    if abs(obs["cubeA_pos"][0]-obs["cubeB_pos"][0]) < 0.025 and abs(obs["cubeA_pos"][1]-obs["cubeB_pos"][1]) < 0.025 and abs(obs["cubeA_pos"][2]-obs["cubeB_pos"][2])<0.07 and flag==3:
+        flag += 1
     return flag
 
 obs_list = ["robot0_eef_pos", "robot0_eef_quat", "robot0_gripper_qpos", "cubeA_pos", "cubeA_quat","cubeB_pos"]
@@ -369,6 +374,6 @@ if __name__ == "__main__":
         epi=collect_human_trajectory(env, device, args.arm, args.config)
         total_epi.append(epi)
 
-        with open('data_IGL_2.pickle', 'wb') as f:
+        with open('data_IGL_sg4_4.pickle', 'wb') as f:
             pickle.dump(total_epi, f, pickle.HIGHEST_PROTOCOL)
         # gather_demonstrations_as_hdf5(tmp_directory, new_dir, env_info)

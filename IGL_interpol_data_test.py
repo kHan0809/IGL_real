@@ -242,7 +242,7 @@ def fix_traj(new_traj, traj1,traj2,coef):
 
 data_concat = []
 for pickle_data in os.listdir(os.getcwd()+'/data_IGL'):
-    if 'Inter_traj_middle_sg0' in pickle_data:
+    if 'data_IGL_con' in pickle_data:
     # if 'middle' in pickle_data:
         with open('./data_IGL/'+ pickle_data, 'rb') as f:
             data = pickle.load(f)
@@ -256,10 +256,10 @@ fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
 
 All_traj = []
-coefs = np.linspace(0,1,11,endpoint=True)
-print(len(data))
-for i in range(10,len(data_concat)-1):
-    for j in range(i+64,len(data_concat)):
+coefs = np.linspace(0,2,11,endpoint=True)
+print(len(data_concat))
+for i in range(1,len(data_concat)-1):
+    for j in range(i+9,len(data_concat)):
         choice=np.array([i,j])
 
         obs_robot1 = np.array(data_concat[choice[0]]['obs_robot'])
@@ -271,12 +271,12 @@ for i in range(10,len(data_concat)-1):
         sub_goal2 = np.array(data_concat[choice[1]]['sg'])
         # idx_sub_traj1 = sub_goal_separator(sub_goal1)
         # idx_sub_traj2 = sub_goal_separator(sub_goal2)
-        print(".............")
-        obs_robot1 = np.array(data_concat[71]['obs_robot'])[:5]
-        print(obs_robot1)
-        obs_robot1 = np.array(data_concat[75]['obs_robot'])[:5]
-        print(obs_robot1)
-        raise
+        # print(".............")
+        # obs_robot1 = np.array(data_concat[71]['obs_robot'])[:5]
+        # print(obs_robot1)
+        # obs_robot1 = np.array(data_concat[75]['obs_robot'])[:5]
+        # print(obs_robot1)
+
 
         robot_candi1 = obs_robot1
         robot_candi2 = obs_robot2
@@ -297,7 +297,7 @@ for i in range(10,len(data_concat)-1):
             print(np.array(fixed_traj["obs_robot"])[-1, :3]-np.array(fixed_traj["obs_obj"])[-1, :3])
 
 
-            print(robot_candi2[-1,:3]-np.array(fixed_traj["obs_robot"])[-1,:3])
+            print(np.array(fixed_traj["obs_obj"])[-1, :3]-np.array(fixed_traj["obs_robot"])[-1,:3])
 
             num = -1
             x,y,z = zip(*np.array(fixed_traj["obs_robot"])[num:,:3])
@@ -355,7 +355,7 @@ for i in range(10,len(data_concat)-1):
             U,V,W=zip(*(r.as_matrix()[:,:,0]/200))
             ax.quiver(x,y,z,U,V,W,color='r')
 
-            defal = 0.06
+            defal = 0.1
 
             ax.set_xlim([-defal+x[0], defal+x[0]])
             ax.set_ylim([-defal+y[0], defal+y[0]])
