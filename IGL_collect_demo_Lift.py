@@ -288,7 +288,6 @@ def gather_demonstrations_as_hdf5(directory, out_dir, env_info):
 
     f.close()
 
-
 if __name__ == "__main__":
     # Arguments
     parser = argparse.ArgumentParser()
