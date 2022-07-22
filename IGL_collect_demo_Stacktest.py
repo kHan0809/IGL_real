@@ -13,7 +13,7 @@ import os
 import shutil
 import time
 from glob import glob
-from Common.quat2euler import q2e
+
 import h5py
 import numpy as np
 
@@ -154,14 +154,29 @@ def collect_human_trajectory(env, device, arm, env_configuration):
 
         # Run environment stepa
 
-        # quat = [obs['robot0_eef_quat'][1],obs['robot0_eef_quat'][2],obs['robot0_eef_quat'][3],obs['robot0_eef_quat'][0]]
-        print(action)
-        print(q2e(*obs['robot0_eef_quat']))
+        quat = [obs['robot0_eef_quat'][1],obs['robot0_eef_quat'][2],obs['robot0_eef_quat'][3],obs['robot0_eef_quat'][0]]
+        r_b = R.from_quat(quat)
+        print("================")
+        print('act',action)
+        print('orig quat',obs['robot0_eef_quat'])
+        print('--- quat', quat)
+        print('Euler zyz',r_b.as_euler('zyz',degrees=False))
+        print('Euler zyx', r_b.as_euler('zyx', degrees=False))
+        # print('pos',obs["robot0_eef_pos"])
         obs, reward, done, info = env.step(action)
-        print(q2e(*obs['robot0_eef_quat']))
-
-
-
+        quat = [obs['robot0_eef_quat'][1], obs['robot0_eef_quat'][2], obs['robot0_eef_quat'][3],obs['robot0_eef_quat'][0]]
+        r = R.from_quat(quat)
+        print('orig quat', obs['robot0_eef_quat'])
+        print('--- quat', quat)
+        print('Euler zyz',r.as_euler('zyz',degrees=False))
+        print('Euler zyx', r.as_euler('zyx', degrees=False))
+        # print('pos', obs["robot0_eef_pos"])
+        print('zyz')
+        print(r.as_euler('zyz',degrees=False) - r_b.as_euler('zyz',degrees=False))
+        print(r_b.as_euler('zyz', degrees=False) - r.as_euler('zyz', degrees=False))
+        print('zyx')
+        print(r.as_euler('zyx',degrees=False) - r_b.as_euler('zyx',degrees=False))
+        print(r_b.as_euler('zyx', degrees=False) - r.as_euler('zyx', degrees=False))
 
 
         obs_robot = _flatten_obs(obs, obs_robot_list)
