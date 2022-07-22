@@ -9,7 +9,7 @@ from Common.Interpolate_traj import traj_interpolation_stack
 
 
 data_concat = []
-subgoal = '3'
+subgoal = '4'
 for pickle_data in os.listdir(os.getcwd()+'/data_IGL'):
     # if 'IGL' in pickle_data:
     if 'Inter_mid_sg'+subgoal in pickle_data:
@@ -20,7 +20,7 @@ for pickle_data in os.listdir(os.getcwd()+'/data_IGL'):
         pass
 
 All_traj = []
-coefs = np.linspace(0,1,4,endpoint=True)
+coefs = np.linspace(0,1,6,endpoint=True)
 print(coefs)
 print(len(data_concat))
 # middle_point = len(data_concat)//2

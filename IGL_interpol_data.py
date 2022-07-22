@@ -12,7 +12,7 @@ def sub_goal_separator(sub_goal):
         if sub_goal[idx] != sub_goal[idx+1]:
             count += 1
             idx_list.append(idx)
-            if count == 3:
+            if count == 4:
                 break
         else:
             pass
@@ -33,6 +33,7 @@ traj_sg0 = []
 traj_sg1 = []
 traj_sg2 = []
 traj_sg3 = []
+traj_sg4 = []
 print(len(data_concat))
 coefs = np.linspace(0,1,3,endpoint=True)
 for i in range(len(data_concat)-1):
@@ -79,6 +80,8 @@ for i in range(len(data_concat)-1):
                         traj_sg2.append(fixed_traj)
                     elif k == 3:
                         traj_sg3.append(fixed_traj)
+                    elif k == 4:
+                        traj_sg4.append(fixed_traj)
             elif i == 0 and j != 1:
                 for coef in coefs[1:]:
                     fixed_traj = traj_interpolation_stack(robot_candi1,robot_candi2,obj_candi1,obj_candi2,k,coef) # 여기 sub goal은 계속 바뀌어야 된다~~0 나중에 바꿔주셈
@@ -91,6 +94,8 @@ for i in range(len(data_concat)-1):
                         traj_sg2.append(fixed_traj)
                     elif k == 3:
                         traj_sg3.append(fixed_traj)
+                    elif k == 4:
+                        traj_sg4.append(fixed_traj)
             else:
                 for coef in coefs[1:-1]:
                     fixed_traj = traj_interpolation_stack(robot_candi1,robot_candi2,obj_candi1,obj_candi2,k,coef) # 여기 sub goal은 계속 바뀌어야 된다~~0 나중에 바꿔주셈
@@ -103,12 +108,15 @@ for i in range(len(data_concat)-1):
                         traj_sg2.append(fixed_traj)
                     elif k == 3:
                         traj_sg3.append(fixed_traj)
+                    elif k == 4:
+                        traj_sg4.append(fixed_traj)
 
 
 print(len(traj_sg0))
 print(len(traj_sg1))
 print(len(traj_sg2))
 print(len(traj_sg3))
+print(len(traj_sg4))
 with open('./data_IGL/Inter_mid_sg0.pickle', 'wb') as f:
     pickle.dump(traj_sg0, f, pickle.HIGHEST_PROTOCOL)
 with open('./data_IGL/Inter_mid_sg1.pickle', 'wb') as f:
@@ -117,3 +125,5 @@ with open('./data_IGL/Inter_mid_sg2.pickle', 'wb') as f:
     pickle.dump(traj_sg2, f, pickle.HIGHEST_PROTOCOL)
 with open('./data_IGL/Inter_mid_sg3.pickle', 'wb') as f:
     pickle.dump(traj_sg3, f, pickle.HIGHEST_PROTOCOL)
+with open('./data_IGL/Inter_mid_sg4.pickle', 'wb') as f:
+    pickle.dump(traj_sg4, f, pickle.HIGHEST_PROTOCOL)
