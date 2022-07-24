@@ -8,7 +8,7 @@ def value_inter(v1, v2, coef):
 def traj_interpolation_stack(traj1,traj2,obj_path1,obj_path2,sub_goal,coef):
     traj1_len = len(traj1) - 1
     traj2_len = len(traj2) - 1
-    inter_traj_real_len = (traj1_len)*coef + (traj2_len)*(1-coef)
+    inter_traj_real_len = (traj1_len)*(1-coef) + (traj2_len)*(coef)
     inter_traj_len = math.ceil(inter_traj_real_len)
 
     ratio1 = traj1_len / inter_traj_len;
